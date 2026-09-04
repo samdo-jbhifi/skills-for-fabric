@@ -10,19 +10,31 @@
         "*"
       ]
     },
-    "powerbi-modeling-mcp": {
+
+    "powerbi-modeling-http": {
       "type": "http",
       "url": "https://api.fabric.microsoft.com/v1/mcp/powerbi/authoring",
       "tools": [
         "*"
       ]
     },
+
     "fabric-sqlendpoint": {
       "type": "http",
       "url": "https://api.fabric.microsoft.com/v1/mcp/dataPlane/sqlEndpoint",
       "tools": [
         "execute_query"
       ]
+    },
+
+    "powerbi-modeling-stdio": {
+      "type": "stdio",
+      "command": "C:\\Users\\sam.do\\Documents\\skills-for-fabric\\extension\\server\\powerbi-modeling-mcp.exe",
+      "args": [
+        "--start"
+      ]
     }
   }
 }
+
+
