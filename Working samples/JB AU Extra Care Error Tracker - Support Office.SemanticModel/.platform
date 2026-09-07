@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "JB AU Extra Care Error Tracker - Support Office"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "93f8ad1d-70fd-450d-b77c-2376912fb8bc"
+  }
+}

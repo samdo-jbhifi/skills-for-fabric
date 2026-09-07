@@ -1,0 +1,41 @@
+relationship d028fc71-5ecd-7893-934a-0290aa724585
+	crossFilteringBehavior: bothDirections
+	securityFilteringBehavior: bothDirections
+	fromColumn: 'Date Group'.DATE_KEY
+	toColumn: Date.DATE_KEY
+
+relationship 3a5f3f40-d3a4-3994-bc3d-ec21aee615ed
+	fromColumn: 'Sales and Return Errors'.COUNTRY_PRIMARY_STOCK_CODE
+	toColumn: 'Primary Products'.COUNTRY_STOCK_CODE
+
+relationship aa125349-43d8-4e31-bb56-86eaac1945c4
+	crossFilteringBehavior: bothDirections
+	securityFilteringBehavior: bothDirections
+	fromColumn: 'PBI User Security'.COUNTRY_STORE_ID
+	toColumn: Store.COUNTRY_STORE_ID
+
+relationship 68c74e99-0c46-d843-d8b3-0f7490616997
+	fromColumn: 'Sales and Return Errors'.COUNTRY_EXTRA_CARE_STOCK_CODE
+	toColumn: 'EC Products'.COUNTRY_STOCK_CODE
+
+relationship 5b0401ea-d300-dde4-34f7-1178b63db9bc
+	fromColumn: 'Sales and Return Errors'.'Written Sales Date'
+	toColumn: Date.DATE_KEY
+
+relationship AutoDetected_b9964172-c930-4fd7-a9e8-da83d076d424
+	fromColumn: 'Sales and Return Errors'.COUNTRY_ID
+	toColumn: Country.COUNTRY_ID
+
+relationship AutoDetected_f8ce0b30-99b3-4e64-b10e-e8904f11d6d0
+	fromColumn: 'Sales and Return Errors'.SUB_SALE_CHANNEL_ID
+	toColumn: 'Selling Channel'.SUB_SALE_CHANNEL_ID
+
+relationship e94c27c9-98da-471d-1a6a-d8658783f41c
+	fromColumn: 'Sales and Return Errors'.COUNTRY_EXTRA_CARE_STORE_ID
+	toColumn: Store.COUNTRY_STORE_ID
+
+relationship a56a58a4-63ce-de89-721d-0423b49eb103
+	toCardinality: many
+	fromColumn: 'Sales and Return Errors'.COUNTRY_EXTRA_CARE_EMPLOYEE_CODE
+	toColumn: 'Extra Care Salesperson'.COUNTRY_EMPLOYEE_CODE
+

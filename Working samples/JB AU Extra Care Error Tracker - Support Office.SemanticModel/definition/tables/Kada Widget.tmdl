@@ -1,0 +1,29 @@
+table 'Kada Widget'
+	isHidden
+	lineageTag: bca507ab-7beb-4f05-a001-e7227a05c625
+
+	column 'Kada Widget'
+		dataType: string
+		isHidden
+		lineageTag: 1cc8acc2-8040-4de8-968e-dc55b02a5caa
+		summarizeBy: none
+		sourceColumn: Kada Widget
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Kada Widget' = m
+		mode: import
+		source =
+				let
+				    Source = #"Kada Param"
+				in
+				    Source
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

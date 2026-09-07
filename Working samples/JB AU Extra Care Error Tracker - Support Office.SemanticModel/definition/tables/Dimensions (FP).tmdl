@@ -1,0 +1,71 @@
+table 'Dimensions (FP)'
+	lineageTag: ed813676-11b4-4a1e-88c9-bda6d99757f0
+
+	column 'Dimensions (FP)'
+		lineageTag: 8249cf93-191c-4f94-a646-fc4a2abbf6d5
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Dimensions (FP) Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Dimensions (FP) Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dimensions (FP) Fields'
+		isHidden
+		lineageTag: b5f71d44-6d3d-4276-93a3-650153b643d3
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Dimensions (FP) Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dimensions (FP) Order'
+		isHidden
+		formatString: 0
+		lineageTag: 37064247-8d65-4c0a-be82-2ec91834f23b
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dimensions (FP)' = calculated
+		mode: import
+		source = ```
+				
+				
+				/* 
+				This is a field parameter!
+				You can create your own from: Modelling > New Parameter > Fields
+				
+				Field parameters (FP) are really great for changing the axes of a visual (by either metric or dimension, or both!).
+				Also you can create additional custom columns by adding to this FP table.
+				*/
+				
+				{
+				    // ("Country Code",          NAMEOF('Country'[Country Code]),                     1),
+				    ("EC Saleperson",         NAMEOF('Extra Care Salesperson'[Employee Full Name]),   2),
+				    ("Area",             NAMEOF('Store'[Area Desc]),                                  3),
+				    ("Store",            NAMEOF('Store'[Store Name]),                                 4),    
+				    ("Sale Channel",     NAMEOF('Selling Channel'[Sale Channel Desc]),           5),
+				    ("Sub Sale Channel", NAMEOF('Selling Channel'[Sub Sale Channel Desc]),       6),
+				    ("Fiscal Year",      NAMEOF('Date'[Pnl Year Name]),                       7),
+				    ("Fiscal Quarter",   NAMEOF('Date'[Pnl Quarter Name]),                    8),
+				    ("Fiscal Week",      NAMEOF('Date'[Pnl Week Name]),                       9),
+				    ("Date Group",       NAMEOF('Date Group'[Date Group Desc]),                  10),
+				    ("Primary Product Department",       NAMEOF('Primary Products'[Department Desc]), 11),
+				    ("Primary Product Group",    NAMEOF('Primary Products'[Product Group Desc]),      12),
+				    ("Primary Product Brand",                 NAMEOF('Primary Products'[Brand]),      13),
+				    ("Primary Season Code",           NAMEOF('Primary Products'[Season Code]),        14)
+				}
+				```
+
+	annotation PBI_Id = 3d8896ac41304a1b8ef90404a61556c1
+

@@ -1,0 +1,123 @@
+table 'PBI User Security'
+	isHidden
+	lineageTag: 5d8e9cfa-184d-4207-bb61-67e637053866
+
+	column COUNTRY_ID
+		dataType: double
+		isHidden
+		lineageTag: 97f2dbb7-5dd1-4e98-85e7-bd3bde057c84
+		summarizeBy: count
+		sourceColumn: COUNTRY_ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column STORE_ID
+		dataType: double
+		isHidden
+		lineageTag: cfedb67f-e023-41b2-9606-d6d20c79906b
+		summarizeBy: count
+		sourceColumn: STORE_ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column COUNTRY_STORE_ID
+		dataType: string
+		isHidden
+		lineageTag: c508553b-03c5-4d3c-9c91-d0a9e945c031
+		summarizeBy: none
+		sourceColumn: COUNTRY_STORE_ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column AREA_ID
+		dataType: double
+		isHidden
+		lineageTag: 50a7a49a-a86c-4681-932c-64e0a4fa8ac8
+		summarizeBy: count
+		sourceColumn: AREA_ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column REGIONAL_ID
+		dataType: double
+		isHidden
+		lineageTag: f46baf09-ada3-4909-bad2-2966f6c729ad
+		summarizeBy: count
+		sourceColumn: REGIONAL_ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AREA_MANAGER_ID
+		dataType: double
+		isHidden
+		lineageTag: 04dd53ec-134a-4806-920c-05dca6590e72
+		summarizeBy: count
+		sourceColumn: AREA_MANAGER_ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Store Email'
+		dataType: string
+		isHidden
+		lineageTag: 1dc1cd6e-8027-48bb-b341-7e6ede0c7584
+		summarizeBy: none
+		sourceColumn: Store Email
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Area Manager Email'
+		dataType: string
+		isHidden
+		lineageTag: fdc3208f-533b-4339-a13e-fa41800fc653
+		summarizeBy: none
+		sourceColumn: Area Manager Email
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PBI User Security' = m
+		mode: import
+		queryGroup: Dimensions
+		source =
+				let
+				    Source = PowerPlatform.Dataflows(null),
+				    Workspaces = Source{[Id="Workspaces"]}[Data],
+				    #"381214d4-ea63-4a86-87da-8aebf81978ae" = Workspaces{[workspaceId="381214d4-ea63-4a86-87da-8aebf81978ae"]}[Data],
+				    #"c8f09baa-dbd9-401b-8d55-1801f53ef645" = #"381214d4-ea63-4a86-87da-8aebf81978ae"{[dataflowId="c8f09baa-dbd9-401b-8d55-1801f53ef645"]}[Data],
+				    #"PBI User Security_" = #"c8f09baa-dbd9-401b-8d55-1801f53ef645"{[entity="PBI User Security",version=""]}[Data],
+				    #"Removed Other Columns" = Table.SelectColumns(#"PBI User Security_",{"COUNTRY_ID", "STORE_ID", "COUNTRY_STORE_ID", "AREA_ID", "REGIONAL_ID", "AREA_MANAGER_ID", "Store Email", "Area Manager Email"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Other Columns", each ([COUNTRY_ID] = COUNTRY_ID))
+				in
+				    #"Filtered Rows"
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

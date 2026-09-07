@@ -133,8 +133,12 @@ Review rule:
 
 ## 6. Relationships — bidirectional / many-to-many paths
 
-Ten relationships were inspected. Three use `BothDirections` cross-filtering, two of which are
-many-to-many:
+> A report's actual relationship list will differ from the template's — different fact/dimension
+> shapes are expected. What's being checked here is the *standard* (justify bidirectional/M:M
+> paths, hide keys correctly, sensible cardinality), not that the list below matches exactly.
+
+Ten relationships were inspected in the template itself. Three use `BothDirections`
+cross-filtering, two of which are many-to-many:
 
 | From → To | Cardinality | Cross-filter |
 |---|---|---|
@@ -161,10 +165,14 @@ A hidden table (`isHidden: true`), sourced from a Power Platform dataflow, colum
 `Store Email`, `Area Manager Email`. Its M query comment: *"This table is especially important
 when limiting data depending on the user via Row-Level Security (RLS)."*
 
+> A derived report's RLS grain may legitimately differ from this column shape (e.g. per-employee
+> instead of per-store/area — see the GRP sibling doc's version, which does exactly that). Don't
+> flag a different column shape as a defect on its own; the invariant below is what to check.
+
 Review rule:
-- **Critical**: this table must remain hidden in any derived report. If a report author needs new
-  RLS scopes (e.g. by regional manager), extend this table's source query rather than building a
-  parallel security table.
+- **Critical**: this table must remain hidden in any derived report, whatever its column shape. If
+  a report author needs new RLS scopes (e.g. by regional manager), extend this table's source
+  query rather than building a parallel security table.
 - Per the `semantic-model-authoring` skill's DENY rule: do **not** attempt to add/remove RLS role
   *membership* as part of this review — flag membership concerns and redirect to the Power BI
   portal; only the table's shape (columns, hidden state) is in scope here.
@@ -200,6 +208,71 @@ From `model_operations Get` on the template: `defaultMode: Import`, `culture: en
   template. Tightening this to `true` (forcing explicit measures only) is generally good practice,
   but doing so is a deliberate model-wide change, not something to flip silently during a report
   review — raise it as a suggestion, don't apply it as part of a routine review.
+
+## 10. Company reporting standards — visuals, colour, and performance
+
+These are JBHIFI Group-wide report-authoring standards (from company guidance, not derived from
+inspecting this template) — they apply to any report regardless of which template it descends
+from.
+
+### Native visuals preferred over imported ones
+- **Recommended**: prefer a native Power BI visual over an imported/custom one whenever an
+  equivalent exists — e.g. the native **Button Slicer** instead of the imported **Chiclet Slicer**.
+  Flag any imported visual and check whether a native equivalent would serve the same purpose
+  before accepting it.
+
+### Colour palette
+- **Recommended**: prefer the JB colour theme shipped with the reporting template over ad-hoc
+  colours (this is what the `Line of Business Colour` / `Line of Business Font Colour` measures in
+  §1 exist to apply). Where a non-brand colour is needed (status/traffic-light indicators, chart
+  accents), use these standard hex codes rather than inventing new ones:
+
+  | Purpose | Colour | Hex |
+  |---|---|---|
+  | Default text | Default Text Black | `#252423` |
+  | — | Black | `#000000` |
+  | Traffic light (text) | Soft Green | `#AAE6AA` |
+  | Traffic light (text) | Soft Amber | `#F7DE6F` |
+  | Traffic light (text) | Soft Red | `#FF8080` |
+  | Traffic light (background) | Harsh Red | `#BF2020` |
+  | Traffic light (background) | Harsh Amber | `#FFA500` |
+  | Traffic light (background) | Harsh Green | `#3B803B` |
+  | Chart | Orange | `#F2C80F` |
+  | Chart | Light complimentary orange | `#FAE99F` |
+  | Chart | Light Grey | `#BBBBBB` |
+  | Chart | Dark Grey | `#2F2F2E` |
+  | Chart | Gold | `#E8D166` |
+  | Chart | Silver | `#B3B3B3` |
+
+  Soft variants are for *text* on a light background; harsh variants are for status
+  *backgrounds* (e.g. a KPI tile). Don't use a harsh-background hex as a text colour or vice versa.
+
+### Report/model performance and capacity
+
+Fabric/Power BI Service capacity is shared across all reports on it — a poorly optimised report
+degrades performance for everyone else on the same capacity, not just its own users.
+
+- **Recommended**: measure before optimising — use **Performance Analyzer**. Standard tip: add a
+  blank page, save and reopen the report (this clears the visual + data-engine cache), start
+  Performance Analyzer on the blank page, *then* navigate to the page under test — this captures
+  true initial-load performance rather than a warm-cache number.
+- **Recommended**: avoid **Matrix** visuals where possible — they're capacity-expensive. Prefer a
+  **Table visual + Field Parameters** when the report needs to let the user change granularity —
+  the template's own `Metrics (FP)` / `Dimensions (FP)` tables (§8) are exactly this pattern; point
+  report authors at that existing scaffolding rather than reaching for a Matrix.
+- **Critical**: flag overly complex calculated columns or measures during review — they push
+  compute cost into every report using the model. If a report's DAX is fighting the model instead
+  of the model supporting the report, that's a sign to request a purpose-built Snowflake asset
+  from the Reporting and Analytics team rather than compensating with heavier DAX.
+- **Recommended**: check the model is aggregated to the lowest granularity the report actually
+  needs — e.g. don't import SKU-level rows if every visual reports at product-department level.
+  This is a modeling-time decision (partition/M-query grain), not something to patch after the
+  fact with `SUMMARIZE` in every measure.
+
+Raise these as **recommended** findings unless a specific violation is severe enough to
+independently justify **critical** (e.g. a Matrix visual driving a known capacity incident, or a
+measure whose complexity is the confirmed root cause of a reported performance issue) — don't
+default to critical just because a rule exists here.
 
 ## Findings format
 

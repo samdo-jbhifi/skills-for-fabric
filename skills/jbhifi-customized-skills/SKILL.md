@@ -17,6 +17,42 @@ MCP inspection of that template's actual semantic model (not generic best practi
 right doc before reviewing a report — the two templates have diverged (see each doc's own
 divergence notes), so don't apply one template's doc to a report built from the other.
 
+## Review philosophy — standard compliance, not exact replication
+
+**Every report will legitimately have different measures and DAX than the template — that's
+expected, not a defect.** Don't flag a report for having a measure the template doesn't, lacking
+one the template has, or computing something differently. Judge it against the *standard* the
+template's own patterns demonstrate instead:
+
+- **Naming convention** is followed (technical keys hidden + `ALL_CAPS_SNAKE_CASE`, business
+  columns visible + `Title Case`) — regardless of what those columns actually represent.
+- **Formula/DAX standard** is followed (explicit `formatString`, `ISINSCOPE` guards on comparative
+  measures, no dead or broken references, no `SemanticError`/`DependencyError` states) —
+  regardless of what the formula calculates.
+- **Relationships are up to standard** (sensible cardinality, any bidirectional/many-to-many path
+  justified, keys correctly hidden) — not that the relationship *list* matches the template's.
+- **No unused measures** — every measure should be referenced by something (a visual, another
+  measure, RLS logic). One that isn't is a defect regardless of whether it matches a template
+  pattern. Full confirmation of "referenced by a visual" needs the report side
+  (`powerbi-report-authoring` / `powerbi-report-management`, PBIR inspection) — the semantic-model
+  MCP alone can only confirm measure-to-measure references, not visual usage. Flag candidates from
+  the MCP-only pass, but don't declare a measure dead without checking the report pages too.
+
+**Company guidance now covered**: each per-template doc's last content section (before "Findings
+format") documents JBHIFI Group-wide standards for native-visual preference, the JB colour
+palette (with hex codes), and report/model performance & capacity guidance (Performance Analyzer
+workflow, avoiding Matrix visuals, complexity, granularity). These apply to any report regardless
+of template.
+
+**Still out of scope here — don't let that mean "skipped"**: actually auditing a report's visuals
+— which specific visual type is used on which page, actual font sizes, slicer/visual pixel
+placement, whether the colour palette above was *actually applied* rather than just documented as
+a rule — requires reading the report's PBIR/pages, which none of these docs do (they're written
+purely from `powerbi-modeling-stdio` MCP inspection of the semantic model). A complete report
+review needs a separate pass with `powerbi-report-design` (visual/theme critique) and
+`powerbi-report-authoring` (PBIR mechanics) — say so explicitly when handing back a
+semantic-model-only review, rather than implying the visuals themselves were checked.
+
 ## Which doc to load
 
 | Report was built from... | Load |

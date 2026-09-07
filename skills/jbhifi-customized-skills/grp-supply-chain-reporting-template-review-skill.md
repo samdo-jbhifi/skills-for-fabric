@@ -78,7 +78,7 @@ Review rule:
 - If you find a report derived from this template where `Sales` *is* wired up correctly, treat
   that as the reference and consider back-porting the relationships into the template itself.
 
-## 2. `Date` table is a reduced 18-column subset — not the full fiscal calendar
+## 2. `Date` table is a reduced as needed-column subset — not the full fiscal calendar
 
 JB Hi-Fi's `Date` table has 109 columns (full Fiscal + Pnl calendars, Ly/Lly offsets for every
 grain, `Is*` flags — see JB Hi-Fi doc §5). GRP's `Date` table has only **18 columns**:
@@ -161,6 +161,10 @@ Two of `Product`'s own relationships are **inactive**: `Product` → `Product V2
 `Supplier`. Only `Group Product` → `Supplier` is active. This suggests supplier/product-V2 lineage
 is being routed through `Group Product` rather than `Product`'s direct links.
 
+> A derived report's relationship list will differ from this template's — different fact tables
+> mean different wiring. What's being checked is the *standard* (justified bidirectional paths,
+> no ambiguous dual routes to the same dimension), not that the relationships match exactly.
+
 Review rule:
 - **Recommended**: follow this "Group X satellite table" pattern for any new cross-brand attribute
   — don't add group-level columns straight onto `Employee`/`Product`, which stay portable
@@ -190,6 +194,73 @@ Review rule:
 - **Critical**: this table must remain hidden, same as JB Hi-Fi doc §7. Don't assume its column
   shape should match JB Hi-Fi's — it's intentionally different here.
 - Same DENY as JB Hi-Fi doc §7: don't touch RLS role membership as part of a review.
+
+## 8. Company reporting standards — visuals, colour, and performance
+
+These are JBHIFI Group-wide report-authoring standards (from company guidance, not derived from
+inspecting this template) — identical to JB Hi-Fi doc §10, repeated here since they apply
+regardless of which template a report descends from.
+
+### Native visuals preferred over imported ones
+- **Recommended**: prefer a native Power BI visual over an imported/custom one whenever an
+  equivalent exists — e.g. the native **Button Slicer** instead of the imported **Chiclet Slicer**.
+  Flag any imported visual and check whether a native equivalent would serve the same purpose
+  before accepting it.
+
+### Colour palette
+- **Recommended**: prefer the JB colour theme shipped with the reporting template over ad-hoc
+  colours (this is what the `Line of Business Colour` / `Line of Business Font Colour` /
+  `Slicer Panel Background Colour` measures in §3/§4 exist to apply). Where a non-brand colour is
+  needed (status/traffic-light indicators, chart accents), use these standard hex codes rather
+  than inventing new ones:
+
+  | Purpose | Colour | Hex |
+  |---|---|---|
+  | Default text | Default Text Black | `#252423` |
+  | — | Black | `#000000` |
+  | Traffic light (text) | Soft Green | `#AAE6AA` |
+  | Traffic light (text) | Soft Amber | `#F7DE6F` |
+  | Traffic light (text) | Soft Red | `#FF8080` |
+  | Traffic light (background) | Harsh Red | `#BF2020` |
+  | Traffic light (background) | Harsh Amber | `#FFA500` |
+  | Traffic light (background) | Harsh Green | `#3B803B` |
+  | Chart | Orange | `#F2C80F` |
+  | Chart | Light complimentary orange | `#FAE99F` |
+  | Chart | Light Grey | `#BBBBBB` |
+  | Chart | Dark Grey | `#2F2F2E` |
+  | Chart | Gold | `#E8D166` |
+  | Chart | Silver | `#B3B3B3` |
+
+  Soft variants are for *text* on a light background; harsh variants are for status
+  *backgrounds* (e.g. a KPI tile). Don't use a harsh-background hex as a text colour or vice versa.
+
+### Report/model performance and capacity
+
+Fabric/Power BI Service capacity is shared across all reports on it — a poorly optimised report
+degrades performance for everyone else on the same capacity, not just its own users.
+
+- **Recommended**: measure before optimising — use **Performance Analyzer**. Standard tip: add a
+  blank page, save and reopen the report (this clears the visual + data-engine cache), start
+  Performance Analyzer on the blank page, *then* navigate to the page under test — this captures
+  true initial-load performance rather than a warm-cache number.
+- **Recommended**: avoid **Matrix** visuals where possible — they're capacity-expensive. Prefer a
+  **Table visual + Field Parameters** when the report needs to let the user change granularity —
+  this template's own `Metrics (FP)` / `Dimensions (FP)` tables (JB Hi-Fi doc §8) are exactly this
+  pattern; point report authors at that existing scaffolding rather than reaching for a Matrix.
+- **Critical**: flag overly complex calculated columns or measures during review — they push
+  compute cost into every report using the model. If a report's DAX is fighting the model instead
+  of the model supporting the report, that's a sign to request a purpose-built Snowflake asset
+  from the Reporting and Analytics team rather than compensating with heavier DAX. (This template
+  already shows the cost of unresolved model gaps — see §0/§1.)
+- **Recommended**: check the model is aggregated to the lowest granularity the report actually
+  needs — e.g. don't import SKU-level rows if every visual reports at product-department level.
+  This is a modeling-time decision (partition/M-query grain), not something to patch after the
+  fact with `SUMMARIZE` in every measure.
+
+Raise these as **recommended** findings unless a specific violation is severe enough to
+independently justify **critical** (e.g. a Matrix visual driving a known capacity incident, or a
+measure whose complexity is the confirmed root cause of a reported performance issue) — don't
+default to critical just because a rule exists here.
 
 ## Findings format
 
