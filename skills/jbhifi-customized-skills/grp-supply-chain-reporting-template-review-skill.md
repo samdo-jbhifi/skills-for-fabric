@@ -49,34 +49,49 @@ Review rule:
   (`Line of Business Colour` modified 2026-05-04, `Slicer Panel Background Colour` added
   2026-05-03) while this defect persists.
 
-## 1. Sales fact table has no dimension relationships at all
+## 1. Fact/dimension relationship standard — and where this template breaks it
 
-JB Hi-Fi's `Sales` table has 9 active relationships to `Store`, `Product`, `Date`, `Employee`,
-`Selling Channel`, `Promotions`, `Country`, and `Time Group`. **GRP's `Sales` table — same 14
-columns, same data — has none.** `relationship_operations List` returns 10 relationships total in
-this model, and every one of them is among `Employee`, `Line of Business`, `Product`, `Store`,
-`Supplier`, `Product V2`, `Group Employee`, `Group Product`, `PBI User Security` — none involve
-`Sales`.
+**General standard (applies to any JBHIFI-derived report, whatever its fact table is actually
+called)**: every fact table must have active relationships wired to every dimension table it
+needs to be filtered or sliced by. A fact table with zero relationships to any dimension is
+structurally non-functional — nothing can filter it, and any `USERELATIONSHIP`-based measure that
+assumes a relationship exists will throw a `SemanticError` instead of computing anything. This is
+a star-schema invariant, not a rule about a table specifically named "Sales" — the next report
+reviewed against this doc might have a fact table called `Customer Traffic`, `Returns`, or
+anything else, and the same check applies to whatever it's actually called.
+
+**Evidence found in this template**: the fact table here happens to be named `Sales` (same 14
+columns/shape as JB Hi-Fi's). JB Hi-Fi's version of it has 9 active relationships to `Store`,
+`Product`, `Date`, `Employee`, `Selling Channel`, `Promotions`, `Country`, and `Time Group`.
+**GRP's copy — same columns, same data — has none.** `relationship_operations List` returns 10
+relationships total in this model, and every one of them is among `Employee`, `Line of Business`,
+`Product`, `Store`, `Supplier`, `Product V2`, `Group Employee`, `Group Product`,
+`PBI User Security` — none involve the fact table at all.
 
 This isn't just an oversight to flag gently — it's why §0's measures are broken, and it means
-**no visual in a report built on this template will currently filter `Sales` by Store, Product,
-Date, or anything else**, unless relationships are added first.
+**no visual in a report built on this template will currently filter the fact table by Store,
+Product, Date, or anything else**, unless relationships are added first.
 
 Likely cause, confirmed by column inspection: GRP's `Store` table uses a different key shape
-(`Store Code`, `Store ID`, `Line Of Business Store ID`) than `Sales`' retained
-`COUNTRY_STORE_ID` — the base `Sales` table was carried over unchanged from the single-brand JB
-Hi-Fi shape, but `Store`/`Product` were rebuilt at group level with different keys, so even
-auto-detect relationship discovery wouldn't find a match.
+(`Store Code`, `Store ID`, `Line Of Business Store ID`) than the fact table's retained
+`COUNTRY_STORE_ID` — the fact table was carried over unchanged from the single-brand JB Hi-Fi
+shape, but `Store`/`Product` were rebuilt at group level with different keys, so even auto-detect
+relationship discovery wouldn't find a match.
 
 Review rule:
-- **Critical, blocking**: do not approve a report from this template without first wiring `Sales`
-  to at least `Date` (required for §0's fix) and to whichever dimensions the report actually
-  slices by. This will likely require a bridge/mapping table translating
-  `COUNTRY_STORE_ID` ↔ `Store Code`, `COUNTRY_STOCK_CODE` ↔ `STOCK_CODE`,
+- **Critical, blocking, generalizes beyond this template**: identify the report's actual fact
+  table — typically the one at transaction grain, with the most incoming relationships or measure
+  references, regardless of what it's named — and confirm `relationship_operations List` shows it
+  wired to every dimension the report needs to filter by. Don't search specifically for a table
+  named "Sales"; that name is an artifact of this template family, not a rule.
+- **Critical, blocking (this template's specific case)**: do not approve a report from this
+  template without first wiring the fact table to at least `Date` (required for §0's fix) and to
+  whichever dimensions the report actually slices by. This will likely require a bridge/mapping
+  table translating `COUNTRY_STORE_ID` ↔ `Store Code`, `COUNTRY_STOCK_CODE` ↔ `STOCK_CODE`,
   `COUNTRY_EMPLOYEE_CODE` ↔ `EMPLOYEE_CODE`, `COUNTRY_ID` ↔ `LINE_OF_BUS_ID` — confirm with
   whoever owns the source data before inventing one.
-- If you find a report derived from this template where `Sales` *is* wired up correctly, treat
-  that as the reference and consider back-porting the relationships into the template itself.
+- If you find a report derived from this template where the fact table *is* wired up correctly,
+  treat that as the reference and consider back-porting the relationships into the template itself.
 
 ## 2. `Date` table is a reduced as needed-column subset — not the full fiscal calendar
 

@@ -131,14 +131,26 @@ Review rule:
   names actually exists in `relationship_operations List` — don't just trust the DAX compiles at
   a glance; check the measure's `state` field for `SemanticError`.
 
-## 6. Relationships — bidirectional / many-to-many paths
+## 6. Fact/dimension relationship standard, and bidirectional / many-to-many paths
 
-> A report's actual relationship list will differ from the template's — different fact/dimension
-> shapes are expected. What's being checked here is the *standard* (justify bidirectional/M:M
-> paths, hide keys correctly, sensible cardinality), not that the list below matches exactly.
+**General standard (applies to any JBHIFI-derived report, whatever its fact table is actually
+called)**: every fact table must have active relationships wired to every dimension table it
+needs to be filtered or sliced by — a fact table with zero dimension relationships is
+structurally non-functional. This template's own fact table happens to be named `Sales`; the next
+report reviewed against this doc might have one called `Customer Traffic`, `Returns`, or anything
+else — check whatever the report's actual fact table is, not specifically for a table named
+"Sales". (See the GRP sibling doc §1 for a template where this exact check *fails* — its fact
+table has zero dimension relationships at all.)
 
-Ten relationships were inspected in the template itself. Three use `BothDirections`
-cross-filtering, two of which are many-to-many:
+> Beyond that invariant, a report's actual relationship *list* will differ from the template's —
+> different fact/dimension shapes are expected. What's being checked below is the *standard*
+> (justify bidirectional/M:M paths, hide keys correctly, sensible cardinality), not that the list
+> matches exactly.
+
+In this template, the fact table (`Sales`) is correctly wired — 9 active relationships to `Store`,
+`Product`, `Date`, `Employee`, `Selling Channel`, `Promotions`, `Country`, and `Time Group`. Three
+of its ten total relationships use `BothDirections` cross-filtering, two of which are
+many-to-many:
 
 | From → To | Cardinality | Cross-filter |
 |---|---|---|
@@ -150,10 +162,13 @@ Plus one **inactive** relationship (`Sales[Written Sales Date]` → `Date[Ly Day
 via `USERELATIONSHIP` inside LY measures (per §5) — that's the correct, intentional pattern.
 
 Review rule:
+- **Critical, blocking, generalizes beyond this template**: confirm the report's actual fact table
+  has at least one relationship to every dimension the report needs to filter by. Zero
+  relationships on the fact table is always critical, regardless of what it's named.
 - **Recommended**: any *new* bidirectional or many-to-many relationship should be justified in
-  the relationship's description or PR notes — stacking bidirectional paths on top of the existing
-  three risks ambiguous filter propagation. Don't add one without checking what it does to
-  existing cross-filter behavior on `Sales`.
+  the relationship's description or PR notes — stacking bidirectional paths on top of existing
+  ones risks ambiguous filter propagation. Don't add one without checking what it does to existing
+  cross-filter behavior on the fact table.
 - **Optional**: if a new inactive relationship is added for another comparison (e.g. 2-years-ago),
   follow the same "inactive + `USERELATIONSHIP` inside a guarded measure" pattern rather than a
   second active relationship.

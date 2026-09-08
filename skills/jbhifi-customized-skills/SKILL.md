@@ -31,6 +31,13 @@ template's own patterns demonstrate instead:
   regardless of what the formula calculates.
 - **Relationships are up to standard** (sensible cardinality, any bidirectional/many-to-many path
   justified, keys correctly hidden) — not that the relationship *list* matches the template's.
+  This includes the fact table itself: **every fact table must have active relationships to every
+  dimension it needs to be filtered by, whatever that fact table is actually named.** The
+  per-template docs illustrate this using their own fact table's name (`Sales`, in both templates
+  today) because that's what these two templates happen to call it — don't search for a table
+  literally named "Sales" in a report that isn't derived from these templates, or in a future
+  template variant with a differently-named fact table (e.g. a customer-traffic or returns
+  report). Find the report's actual fact table and check that.
 - **No unused measures** — every measure should be referenced by something (a visual, another
   measure, RLS logic). One that isn't is a defect regardless of whether it matches a template
   pattern. Full confirmation of "referenced by a visual" needs the report side
