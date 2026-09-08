@@ -138,6 +138,7 @@ https://learn.microsoft.com/en-us/rest/api/fabric/articles/
   - Design skill: `skills/powerbi-report-design/SKILL.md` — archetype routing, layout, theme, accessibility
   - Authoring skill: `skills/powerbi-report-authoring/SKILL.md` — PBIR/PBIP file mechanics, Desktop reload/screenshot
   - Management skill: `skills/powerbi-report-management/SKILL.md` — Fabric report item CRUD via `az rest`
+  - JBHIFI report review skill: `skills/jbhifi-customized-skills/SKILL.md` — JBHIFI Group-specific review standard for reports built from JBHIFI reporting templates (naming/formula/relationship conventions, colour palette, native-visual and performance guidance); routes to a per-template doc
 
 ### Data Science
 - **Data Agents**: Conversational AI over Fabric data sources
