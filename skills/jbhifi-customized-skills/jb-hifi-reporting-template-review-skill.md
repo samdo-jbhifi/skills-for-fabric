@@ -11,11 +11,11 @@ connected to Power BI Desktop) of the **JB Hi-Fi Reporting Template** semantic m
 check a derived report against *this template's own standard*, not just generic Power BI best
 practice.
 
-> **Sibling template**: `GRP Supply Chain Reporting Template` (same `JBHIFI_GROUP_TEMPLATES/`
+> **Sibling template**: `GRP Reporting Template` (same `JBHIFI_GROUP_TEMPLATES/`
 > folder) shares this template's core scaffolding — confirmed via matching `lineageTag`s on the
 > `Metrics` table and `Sales Dollars` measure, i.e. same common ancestor — but has since diverged
 > in ways that matter for review. See
-> [grp-supply-chain-reporting-template-review-skill.md](./grp-supply-chain-reporting-template-review-skill.md)
+> [grp-reporting-template-review-skill.md](./grp-reporting-template-review-skill.md)
 > for the GRP-specific deltas (including a confirmed broken measure) rather than assuming the two
 > templates are identical today.
 
@@ -132,6 +132,12 @@ Review rule:
   a glance; check the measure's `state` field for `SemanticError`.
 
 ## 6. Fact/dimension relationship standard, and bidirectional / many-to-many paths
+
+**Star-schema baseline (applies to any data model, not just JBHIFI ones)**: one grain per fact
+table, dimensions conformed rather than snowflaked where practical, surrogate/technical keys
+consistent and hidden (per §4), no dimension left orphaned with zero relationships. The checks
+below are specific instances of this baseline — read them as illustrations of it, not as the
+complete modelling standard on their own.
 
 **General standard (applies to any JBHIFI-derived report, whatever its fact table is actually
 called)**: every fact table must have active relationships wired to every dimension table it
@@ -262,6 +268,47 @@ from.
   Soft variants are for *text* on a light background; harsh variants are for status
   *backgrounds* (e.g. a KPI tile). Don't use a harsh-background hex as a text colour or vice versa.
 
+  **How to check compliance** (learned from a live review that found a banner using an
+  undocumented purple): don't just eyeball a screenshot against the table above.
+  1. Find any colour-switching measure in the model (search `00. Metadata` for `Colour`/`Color`
+     measures) and check what hex it actually computes for the current filter context.
+  2. Separately check what colour the visual *actually renders* — if it doesn't match what the
+     measure computes, the visual likely isn't bound to that measure at all (a hardcoded override
+     was probably applied directly on the visual instead). That's the real defect — not "wrong
+     colour" but "the report stopped using the mechanism the model provides for this."
+  3. Only after ruling that out, check whether the rendered colour matches the brand theme or the
+     table above. A colour that matches neither is a violation; don't assume it does just because
+     no one's checked before.
+
+### Title, logo, and font-size hierarchy
+
+- **Recommended**: report title and the JB Hi-Fi logo should appear together in a consistent
+  header band across every page of a report (not just some pages) — a viewer shouldn't lose the
+  report's identity when navigating between pages.
+- **Recommended**: hold a consistent font-size hierarchy: report title largest, section/visual
+  titles next, KPI card values sized for at-a-glance reading, body/table text smaller again, and
+  slicer labels smallest — don't let a lower tier render larger than the tier above it.
+- **Recommended**: one font family across the report; a mix of fonts (e.g. a slicer in a
+  different typeface than the rest of the page) reads as an accident, not a design choice, unless
+  a design brief says otherwise.
+- This is genuinely a report-canvas/PBIR concern — the semantic model has nothing to say about
+  font size or logo placement. Verifying it needs `powerbi-report-design`/`powerbi-report-authoring`
+  against the actual pages, not this doc's MCP-only checks.
+
+### Slicer and button layout
+
+- **Recommended**: keep slicers grouped in one consistent panel/band per report (e.g. a header
+  strip, as seen in this template's derived reports) rather than scattered individually across a
+  page — consistent placement is what lets a user find "the filters" without hunting.
+- **Recommended**: where a report uses buttons as a view/mode toggle (e.g. switching between a
+  "Sales" and "Return" view), keep that button group visually grouped and positioned consistently
+  across pages that offer the same toggle — don't reposition it per page without a reason.
+- **Optional**: don't over-slice a single panel — if a report accumulates many independent
+  slicers, consider whether a Field Parameter (§8) would serve better than another slicer.
+- Same caveat as above: this is a layout/PBIR concern, not a semantic-model one — flag it as a
+  standard to check, but confirm actual positioning via `powerbi-report-authoring`, not by
+  inference from the model.
+
 ### Report/model performance and capacity
 
 Fabric/Power BI Service capacity is shared across all reports on it — a poorly optimised report
@@ -288,6 +335,33 @@ Raise these as **recommended** findings unless a specific violation is severe en
 independently justify **critical** (e.g. a Matrix visual driving a known capacity incident, or a
 measure whose complexity is the confirmed root cause of a reported performance issue) — don't
 default to critical just because a rule exists here.
+
+## 11. Measure name must match its formula
+
+**General standard (applies to any measure, in any report, regardless of template)**: a measure's
+name is a promise about what it computes. Someone building a visual trusts the name, not the
+expression behind it — if the two disagree, that's a defect independent of whether the DAX itself
+is otherwise correct or error-free.
+
+This isn't something `state`/`errorMessage` will ever flag — a measure can be perfectly valid DAX
+and still be named wrong. It's a manual, semantic check: read the expression, then ask whether the
+name unambiguously describes it to someone who hasn't read the formula.
+
+What this catches (illustrative, not an exhaustive dataset-specific list):
+- A measure named generically (e.g. `Excluded Product`) when the model actually distinguishes
+  multiple product lines or scopes (e.g. Primary vs. Extra Care) and the formula only covers one
+  of them — the name doesn't disambiguate which "excluded product" it means.
+- A `... Colour`/`... Font Colour` measure (per §1) that doesn't actually return a colour string,
+  or a `Total`/`Count`/`Sum` -named measure whose DAX doesn't aggregate anything.
+- A measure whose `modifiedTime` shows its name was changed long after its formula (or vice
+  versa) — that gap is a hint of drift worth checking, not proof of a problem on its own.
+
+Review rule:
+- **Recommended**: for every measure reviewed, flag any name/formula mismatch found, including
+  partial or ambiguous ones — not just outright wrong ones.
+- **Critical** only when the mismatch is severe enough that trusting the name at face value would
+  produce a wrong business conclusion (e.g. a `Total X` measure that silently only covers a
+  subset of X) — otherwise treat it as recommended.
 
 ## Findings format
 
