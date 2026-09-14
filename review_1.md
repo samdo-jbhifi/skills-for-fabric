@@ -33,4 +33,16 @@ R6 (§6) — PBI User Security → Store is BothDirections; confirm it's intenti
 Cleared
 Sales and Return Errors wired to 8 dimensions (§6 ✓) · PBI User Security isHidden: true (§7 ✓) · culture: en-AU, __PBI_TimeIntelligenceEnabled: "0" (§9 ✓) · Date table retains all 109 columns (§5 ✓).
 
-Want me to re-apply the C1/C2/C5 fixes to this PBIP (writes work now with --skip-confirmation), and rebind the banner in C3 back to [Line of Business Colour]? The banner fix is a PBIR file edit, which I can do directly since this is a PBIP — no Node/bridge CLI needed.
+
+created new content in claude.md global with summary for:
+
+
+content: "Claude Code Global Instructions", covering:
+
+Cost Tracking Rules — before any MCP tool call: explain why it's needed, why context is insufficient, what's expected, and a size estimate (Small/Medium/Large) — with confirmation required if Large. After every call: report tool name, purpose, objects accessed/returned, size/token-impact estimates, context availability, and reusability.
+Cost Reduction Rules — avoid broad reads/scans, reuse context and prior MCP results, prefer named/targeted lookups, don't spawn subagents or do optional exploration unnecessarily, warn before token-heavy ops, confirm before High-impact ones.
+Power BI and MCP Cost Controls — never pull whole models/tables/columns/measures/relationships/TMDL/pages unless explicitly requested or technically required; prefer targeted single-object queries; explain before any broad model operation; log every MCP call.
+Activity Logging — maintain an append-only docs/claude-activity-log.md (create docs/ if missing), with a specific entry format (Request/Rationale/Actions/Tools/Files Read/Modified/Created/MCP Calls/Result/Next Planned Action/Notes), logged for every significant action — MCP calls, scans, multi-file reads, file create/modify/delete, running scripts/tests/builds/deployments, config changes, Power BI/DAX/SQL/PQ changes, or Medium/High-impact ops. Skipped for trivial no-tool responses.
+User-Facing Summary — after every significant action: what was done, tools/files involved, estimated token impact, whether the log was updated.
+Approval Rules — confirm before High-impact ops, full-model/all-object reads, full repo scans, multiple subagents, bulk changes, deletions, destructive changes, or deploy/publish. No confirmation needed for targeted named-object reads or appending to the log.
+General Working Rules — smallest sufficient operation, no unmodified files unless required, safest low-cost interpretation when ambiguous, narrower follow-up queries if a tool over-returns.
