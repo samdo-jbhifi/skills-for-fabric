@@ -130,6 +130,15 @@ https://learn.microsoft.com/en-us/rest/api/fabric/articles/
   - Skill: `skills/onelake-catalog-govern-cli/SKILL.md` — select admin-audit, admin-remediate, dataowner-audit, or dataowner-remediate by API surface and intent
   - Primary CLI tool: `az rest` against Fabric Admin/Core and Power BI REST APIs
 
+### Power BI skill and tool routing
+
+For semantic-model authoring, use the installed semantic-model authoring skill (if applicable).
+For model inspection and queries, use the installed Power BI model skill and its MCP tools when they support the task (if applicable).
+For report work, use the applicable Power BI planning, design, authoring, or management skills.
+When a task uses a JB Hi-Fi reporting template, also apply `skills/jbhifi-customized-skills/SKILL.md` for project conventions.
+
+These skills may be used together. Select them by the work being done, read their required instructions, and resolve material conflicts before changing the model or report. Read only the skills relevant to the task. Combine standard and custom skills when both apply. Do not load every Fabric skill. If a skill's scope is unclear, check its description before reading its full SKILL.md. MCP is permitted for developer inspection and validation as well as consumption. 
+
 ### Business Intelligence
 - **Semantic Models**: DAX, XMLA, Power BI integration, TMDL
   - Docs: https://learn.microsoft.com/en-us/power-bi/connect-data/service-datasets-understand
