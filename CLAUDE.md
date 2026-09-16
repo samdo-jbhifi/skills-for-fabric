@@ -25,6 +25,9 @@ az account get-access-token --resource https://api.fabric.microsoft.com
 az account get-access-token --resource https://database.windows.net
 ```
 
+The `fabric-skills` plugin reuses Azure CLI sign-in for its remote MCPs.
+See `mcp-setup/README.md` for prerequisites and older registrations overriding the plugin. Keep access tokens out of chat, logs and saved MCP configuration.
+
 ## Fabric REST APIs
 
 All Fabric operations use the REST APIs documented at:

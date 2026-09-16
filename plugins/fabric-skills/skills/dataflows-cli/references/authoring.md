@@ -38,7 +38,7 @@
 | [mashup-preview.md](authoring/mashup-preview.md) | `executeQuery` contract: bootstrap branch, auto-wrap rule, hard avoid for unbounded preview |
 | [output-destinations.md](authoring/output-destinations.md) | Output destination patterns: Lakehouse Table, Lakehouse Files, Warehouse, ADX, Azure SQL. `DataDestinations` annotation, hidden query, `loadEnabled` rules, connection limitations |
 
-**Common refs** (in [`../../common/`](../../../common/))
+**Common refs** (in `../../../common/`)
 
 | File | When to read |
 |---|---|

@@ -2,6 +2,19 @@
 
 User-facing changes for the public Microsoft Fabric Skills release.
 
+## [0.3.16] - 2026-09-10
+
+### Added
+- Added a root `apm.yml` plus a generated `skills/<name>/apm.yml` for every skill, so a user can install a single skill with `apm install microsoft/skills-for-fabric --skill <name>` instead of a whole plugin bundle.
+- Documented the APM bootstrap and the single-skill install flow, including the scope difference between Copilot CLI (`-g`, `~/.copilot/mcp-config.json`) and VS Code (project scope, `.vscode/mcp.json`).
+
+### Changed
+- Corrected the MCP setup reference in `sqldw-cli` to link the `mcp-setup/README.md` file rather than the directory, so the link resolves for a single installed skill.
+
+### Fixed
+- The `fabric-skills` plugin reuses Azure CLI sign-in for remote MCP connections in local Claude Code. Added matching Codex configuration and guidance for older registrations, without copying access tokens or registering another OAuth application.
+- Improved plugin installation compatibility with older Claude Code versions.
+
 ## [0.3.15] - 2026-09-04
 
 
