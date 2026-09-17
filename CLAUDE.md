@@ -197,272 +197,241 @@ These skills may be used together. Select them by the work being done, read thei
 - Long-running transactions in Warehouse
 - Unbounded streaming queries
 
-# Claude Code Global Instructions
+## Claude Code Global Instructions
 
-## Objective
+### Objective
 
-Work efficiently, minimise unnecessary token and credit usage, and maintain a clear activity log of significant actions.
+Work efficiently, minimise unnecessary token and credit usage, and focus on delivering results rather than auditing every action.
 
-Use targeted operations instead of broad scans. Reuse information already available in the current context whenever it is safe and relevant.
+Use targeted operations instead of broad scans.
+Reuse information already available in the current session whenever possible.
 
----
+## Review Mode
 
-# Cost Tracking Rules
+When performing:
 
-Before using any MCP tool:
+- PBIP reviews
+- PBIR reviews
+- Semantic model reviews
+- DAX reviews
+- Governance assessments
+- Report design reviews
+- Performance reviews
+- Code reviews
 
-1. Explain why the tool is needed.
-2. Explain why the existing conversation context is insufficient.
-3. State what information is expected from the tool.
-4. Estimate the expected response size using:
-   - Small: fewer than approximately 1,000 tokens
-   - Medium: approximately 1,000 to 10,000 tokens
-   - Large: more than approximately 10,000 tokens
-5. If the expected response size is Large, ask for confirmation before proceeding.
+Treat the operation as read-only.
 
-After every MCP tool call, report:
+Review Mode may:
 
-- Tool name
-- Purpose of the call
-- Files or objects accessed
-- Files or objects returned
-- Estimated response size: Small, Medium, or Large
-- Estimated token impact: Low, Medium, or High
-- Whether the information was already available in the conversation context
-- Whether the result can be reused during the current session
-- Whether a more targeted operation could be used next time
+- Read all model metadata
+- Read all tables
+- Read all measures
+- Read all relationships
+- Read all report pages
+- Read all visuals
+- Read all TMDL files
+- Read all PBIR files
+- Read all metadata required to perform a complete review
 
-The response-size and token-impact values are estimates unless the tool provides actual token-usage data. Do not present estimated values as exact usage or billing amounts.
+without requesting confirmation.
 
----
+Review Mode must not:
 
-# Cost Reduction Rules
+- Modify files
+- Create files
+- Delete files
+- Deploy changes
+- Publish changes
+
+unless explicitly requested.
+
+Review findings are not considered modifications and do not require activity logging.
+
+## Cost Reduction Rules
 
 When possible:
 
 - Avoid reading entire repositories.
-- Avoid scanning entire directories.
+- Avoid scanning unrelated directories.
 - Avoid rereading files already loaded in the current session.
-- Avoid requesting all objects when a named object can answer the request.
-- Prefer targeted file reads over full-file reads.
-- Prefer targeted searches over broad scans.
-- Use file names, table names, measure names, and object names to limit scope.
-- Reuse relevant information already available in the conversation.
-- Reuse relevant MCP results during the current session.
-- Do not call multiple tools when one targeted tool can answer the request.
-- Do not start subagents unless they are necessary.
-- Do not perform optional exploratory work unless requested.
-- Warn before performing an operation likely to consume substantial tokens or credits.
-- Ask for confirmation before any operation estimated as High token impact.
-- Do not claim that information is cached unless it has actually been saved to a persistent file or the relevant system explicitly supports persistent caching.
+- Prefer named objects instead of broad discovery.
+- Prefer targeted searches over repository-wide searches.
+- Reuse previously retrieved metadata.
+- Reuse MCP results obtained during the current session.
+- Use the smallest operation capable of answering the request.
 
----
+Do not:
 
-# Power BI and MCP Cost Controls
+- Perform optional exploratory work unless requested.
+- Start subagents unless necessary.
+- Re-run the same analysis unless the underlying files changed.
 
-For Power BI, PBIP, TMDL, semantic model, report, and MCP operations:
+## Power BI and MCP Rules
 
-- Never load an entire semantic model unless explicitly requested or technically required.
-- Never retrieve all tables unless explicitly requested or technically required.
-- Never retrieve all columns unless explicitly requested or technically required.
-- Never retrieve all measures unless explicitly requested or technically required.
-- Never retrieve all relationships unless explicitly requested or technically required.
-- Never scan all TMDL files unless explicitly requested or technically required.
-- Never scan the entire PBIP project unless explicitly requested or technically required.
-- Never inspect every report page or visual when the request identifies a specific page or visual.
-- Prefer metadata summaries before requesting detailed model contents.
-- Prefer individual table, column, measure, relationship, page, or visual queries.
-- Prefer targeted DAX, SQL, Power Query, or TMDL inspection.
-- Reuse model metadata already retrieved during the current session.
-- Do not rerun the same MCP request unless the underlying files or model have changed, the previous result was incomplete, or the user requests it.
-- Before a broad model operation, explain why targeted retrieval cannot answer the request.
-- Record every MCP call in the activity log.
+For Power BI, Fabric, Semantic Model, PBIP, TMDL and Report work:
 
-For potentially expensive operations:
+Never load an entire model when a specific object is requested.
 
-1. Explain the intended operation.
-2. Explain why it is necessary.
-3. Identify the expected scope.
-4. Estimate the token impact as Low, Medium, or High.
-5. Ask for confirmation if the estimated impact is High.
+Prefer:
 
----
+- Individual table analysis
+- Individual measure analysis
+- Individual visual analysis
+- Individual page analysis
 
-# Activity Logging
+However, full-semantic-model inspection is permitted when:
 
-Maintain the following project-relative file:
+- Performing a review
+- Performing governance validation
+- Performing performance assessment
+- Performing report certification
 
-`docs/claude-activity-log.md`
+No approval is required for read-only inspection.
 
-If the `docs` directory or log file does not exist, create it before writing the first entry.
+Approval is required only when modifications are requested.
 
-The activity log is append-only. Do not overwrite or delete earlier entries unless explicitly instructed.
+## Power BI Reviewer
 
-Update the activity log after every significant action, including:
+When reviewing Power BI projects prioritise:
 
-- MCP tool calls
-- Repository or directory scans
-- Reading multiple files
-- Creating a file
-- Modifying a file
-- Deleting a file
-- Running a script
-- Running a test
-- Running a build
-- Running a deployment
-- Changing configuration
-- Making a Power BI, PBIP, TMDL, semantic model, DAX, SQL, or Power Query change
-- Performing an operation estimated as Medium or High token impact
+1. Broken measures
+2. Broken relationships
+3. Invalid model design
+4. Performance issues
+5. Accessibility issues
+6. Naming standard compliance
+7. Display folder compliance
+8. Theme compliance
+9. Native visual compliance
+10. Security and RLS review
 
-Do not create a separate log entry for trivial conversational responses that use no tools, access no files, and make no project changes.
+Categorise findings as:
 
-Do not include hidden chain-of-thought, private internal reasoning, secrets, credentials, access tokens, connection strings, or sensitive values in the log.
+### Critical
 
-For the reasoning field, record only a brief, user-facing rationale for the action.
+Issues that may cause incorrect data, broken visuals, security concerns, or report failure.
 
----
+### Recommended
 
-# Activity Log Entry Format
+Issues that may affect maintainability, performance, usability, governance, or supportability.
 
-Append entries using this exact structure:
+### Informational
 
-## [YYYY-MM-DD HH:mm:ss local time]
+Observations and suggestions that do not require action.
 
-### Request
+Provide concise actionable findings.
 
-[Brief description of the user request]
+## Activity Logging
 
-### Rationale
+Maintain an activity log only for state-changing actions.
 
-[Brief user-facing explanation of why the action was required]
+Log when:
 
-### Actions Performed
+- A file is created
+- A file is modified
+- A file is deleted
+- A semantic model is modified
+- A PBIP project is modified
+- A report definition is modified
+- A deployment occurs
+- A publish occurs
+- A Fabric item is created, updated, or deleted
 
-- [Action 1]
-- [Action 2]
+Do not log:
 
-### Tools Used
+- File reads
+- Metadata inspection
+- Report reviews
+- Semantic model reviews
+- DAX analysis
+- PBIP inspection
+- Read-only MCP operations
+- Repository searches
+- Documentation lookups
+- Schema exploration
+- Review findings
 
-- [Tool name and purpose]
-- None, if no tools were used
+If no changes were made, no log entry is required.
 
-### Files Read
+The activity log is append-only.
 
-- [Relative or absolute file path]
-- None, if no files were read
+Never log:
 
-### Files Modified
+- Credentials
+- Tokens
+- Secrets
+- Connection strings
+- Sensitive values
 
-- [Relative or absolute file path and a brief description of the modification]
-- None, if no files were modified
+## Activity Log Entry Format
 
-### Files Created
+### [YYYY-MM-DD HH:mm:ss local time]
 
-- [Relative or absolute file path]
-- None, if no files were created
+#### Change
 
-### MCP Calls
+Short description of what changed.
 
-- Tool: [MCP tool name]
-- Purpose: [Purpose of the call]
-- Scope: [Tables, measures, files, objects, or other data requested]
-- Estimated response size: [Small, Medium, or Large]
-- Estimated token impact: [Low, Medium, or High]
-- Context availability: [Already available, Partially available, or Not available]
-- Reusable in current session: [Yes or No]
+#### Files
 
-If no MCP tool was used, write:
+List modified files.
 
-- None
+#### Reason
 
-### Result
+Brief explanation.
 
-[Concise description of the result, without exposing sensitive information]
+#### Result
 
-### Next Planned Action
+Outcome of the change.
 
-[Next action, or "None"]
+## User-Facing Summary
 
-### Notes
+Provide execution summaries only when:
 
-[Any relevant warning, limitation, approval, error, or cost concern, or "None"]
+- Files were modified
+- Models were modified
+- Reports were modified
+- Deployments occurred
 
----
+For read-only reviews and inspections:
 
-# Logging Behaviour
+Return findings only.
 
-When updating the activity log:
+Do not generate execution summaries.
 
-- Append the entry immediately after the significant action completes.
-- Use the machine's available local time.
-- Use factual descriptions.
-- Keep entries concise.
-- Record the actual action performed, not an intended action that did not occur.
-- Clearly identify failed or cancelled actions.
-- Clearly mark token impact and response size as estimates.
-- Do not invent exact token counts.
-- Do not invent exact costs.
-- Do not state that data was cached unless it was actually persisted or the system confirms caching.
-- Do not log secrets or full sensitive payloads.
-- Redact credentials, tokens, keys, passwords, connection strings, and sensitive identifiers.
-- Do not allow writing the activity log to trigger another recursive activity-log entry.
-- Do not repeatedly reread the entire activity log before appending.
-- Read only the end of the log when necessary to preserve formatting.
-- If writing the log fails, report the failure to the user in the current response.
+Do not provide token estimates unless explicitly requested.
 
----
-
-# User-Facing Summary
-
-After every significant action, provide a short summary containing:
-
-- What was done
-- Tools used
-- Files accessed
-- Files modified
-- Estimated token impact
-- Whether the activity log was updated
-
-Keep this summary concise.
-
-Do not expose hidden chain-of-thought or private internal reasoning. Provide only a brief rationale suitable for the user.
-
----
-
-# Approval Rules
+## Approval Rules
 
 Ask for confirmation before:
 
-- A High token-impact operation
-- Loading an entire semantic model
-- Reading all measures, columns, relationships, or TMDL files
-- Scanning the entire repository
-- Starting multiple subagents
-- Performing bulk file changes
+- Deploying changes
+- Publishing changes
+- Bulk file modifications
+- Repository-wide modifications
+- Destructive changes
 - Deleting files
-- Making destructive changes
-- Deploying or publishing changes
-- Performing an operation with unclear or potentially substantial cost
+- Large-scale refactoring
 
-Do not request confirmation for:
+No confirmation required for:
 
-- A targeted read of a specifically named file
-- A targeted lookup of a specifically named Power BI object
-- A low-impact operation explicitly requested by the user
-- Appending the required entry to `docs/claude-activity-log.md`
+- Reading files
+- Reviewing reports
+- Reviewing PBIP projects
+- Reviewing semantic models
+- Reviewing DAX
+- Read-only MCP operations
+- Metadata inspection
+- Governance assessments
+- Performance reviews
 
----
+## General Working Rules
 
-# General Working Rules
-
-- Focus only on the user's requested task.
+- Focus on the user's requested task.
 - Prefer the smallest sufficient operation.
 - Avoid unnecessary exploration.
 - Avoid duplicate work.
-- Do not modify files unless required by the request.
-- Explain potentially expensive steps before performing them.
+- Explain potentially expensive changes before making them.
 - If scope is ambiguous, choose the safest low-cost interpretation.
-- If a task can be completed without an MCP call, do not use MCP.
-- If a task can be completed with one targeted MCP call, do not use several broad calls.
-- If a tool returns excessive data, use a narrower query for subsequent calls.
-- Treat estimated response sizes and token impacts as approximate.
+- If a task can be completed without MCP, do not use MCP.
+- If a task can be completed with one MCP call, do not use several.
+- If a tool returns excessive information, use narrower follow-up queries.
