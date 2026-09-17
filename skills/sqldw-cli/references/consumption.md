@@ -75,7 +75,7 @@
 
 > **Agent preflight** — verify before first SQL operation:
 > 1. Confirm the `fabric-sqlendpoint-execute_query` tool is available in your tool list. This tool is provided by the `fabric-sqlendpoint` MCP server, which is registered either by installing a Fabric skills **plugin** (the path for end users) or via this repo's `.mcp.json` — other MCP clients may register it through their own configuration.
-> 2. If no matching tool is found, the user must register the Fabric SQL Endpoint MCP server. See [mcp-setup/](../../../mcp-setup/) for registration instructions.
+> 2. If no tool matches, the user must register the Fabric SQL Endpoint MCP server. See [MCP setup](../../../mcp-setup/README.md) for registration instructions.
 >    - **Global URL**: `https://api.fabric.microsoft.com/v1/mcp/dataPlane/sqlEndpoint`
 >    - **Item-scoped URL**: `https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/{workspaceId}/items/{itemId}/sqlEndpoint`
 
