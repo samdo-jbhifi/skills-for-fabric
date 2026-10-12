@@ -135,6 +135,15 @@ https://learn.microsoft.com/en-us/rest/api/fabric/articles/
   - Skill: `skills/onelake-catalog-govern-cli/SKILL.md` — select admin-audit, admin-remediate, dataowner-audit, or dataowner-remediate by API surface and intent
   - Primary CLI tool: `az rest` against Fabric Admin/Core and Power BI REST APIs
 
+### Power BI skill and tool routing
+
+For semantic-model authoring, use the installed semantic-model authoring skill (if applicable).
+For model inspection and queries, use the installed Power BI model skill and its MCP tools when they support the task (if applicable).
+For report work, use the applicable Power BI planning, design, authoring, or management skills.
+When a task uses a JB Hi-Fi reporting template, also apply `skills/jbhifi-customized-skills/SKILL.md` for project conventions.
+
+These skills may be used together. Select them by the work being done, read their required instructions, and resolve material conflicts before changing the model or report. Read only the skills relevant to the task. Combine standard and custom skills when both apply. Do not load every Fabric skill. If a skill's scope is unclear, check its description before reading its full SKILL.md. MCP is permitted for developer inspection and validation as well as consumption. 
+
 ### Business Intelligence
 - **Semantic Models**: DAX, XMLA, Power BI integration, TMDL
   - Docs: https://learn.microsoft.com/en-us/power-bi/connect-data/service-datasets-understand
@@ -146,10 +155,11 @@ https://learn.microsoft.com/en-us/rest/api/fabric/articles/
   - Docs: https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report
   - Skill docs: https://aka.ms/Report_Authoring_skill_LearnDocs
   - Power BI report skill: `skills/powerbi-report-cli/SKILL.md` -- one skill covering the whole report item
-    - Planning mode: requirements, page plan, approval gate
-    - Design mode: archetype routing, layout, theme, accessibility
-    - Authoring mode: PBIR/PBIP file mechanics, Desktop reload/screenshot
-    - Management mode: Fabric report item CRUD via `az rest`
+    - Planning mode: `skills/powerbi-report-planning/SKILL.md` — requirements, page plan, approval gate
+    - Design mode: `skills/powerbi-report-design/SKILL.md` — archetype routing, layout, theme, accessibility
+    - Authoring mode: `skills/powerbi-report-authoring/SKILL.md` — PBIR/PBIP file mechanics, Desktop reload/screenshot
+    - Management mode: `skills/powerbi-report-management/SKILL.md` — Fabric report item CRUD via `az rest`
+    - JBHIFI report review skill: `skills/jbhifi-customized-skills/SKILL.md` — JBHIFI Group-specific review standard for reports built from JBHIFI reporting templates (naming/formula/relationship conventions, colour palette, native-visual and performance guidance); routes to a per-template doc
 
 ### Data Science
 - **Data Agents**: Conversational AI over Fabric data sources
@@ -193,3 +203,242 @@ https://learn.microsoft.com/en-us/rest/api/fabric/articles/
 - SELECT * without LIMIT on large tables
 - Long-running transactions in Warehouse
 - Unbounded streaming queries
+
+## Claude Code Global Instructions
+
+### Objective
+
+Work efficiently, minimise unnecessary token and credit usage, and focus on delivering results rather than auditing every action.
+
+Use targeted operations instead of broad scans.
+Reuse information already available in the current session whenever possible.
+
+## Review Mode
+
+When performing:
+
+- PBIP reviews
+- PBIR reviews
+- Semantic model reviews
+- DAX reviews
+- Governance assessments
+- Report design reviews
+- Performance reviews
+- Code reviews
+
+Treat the operation as read-only.
+
+Review Mode may:
+
+- Read all model metadata
+- Read all tables
+- Read all measures
+- Read all relationships
+- Read all report pages
+- Read all visuals
+- Read all TMDL files
+- Read all PBIR files
+- Read all metadata required to perform a complete review
+
+without requesting confirmation.
+
+Review Mode must not:
+
+- Modify files
+- Create files
+- Delete files
+- Deploy changes
+- Publish changes
+
+unless explicitly requested.
+
+Review findings are not considered modifications and do not require activity logging.
+
+## Cost Reduction Rules
+
+When possible:
+
+- Avoid reading entire repositories.
+- Avoid scanning unrelated directories.
+- Avoid rereading files already loaded in the current session.
+- Prefer named objects instead of broad discovery.
+- Prefer targeted searches over repository-wide searches.
+- Reuse previously retrieved metadata.
+- Reuse MCP results obtained during the current session.
+- Use the smallest operation capable of answering the request.
+
+Do not:
+
+- Perform optional exploratory work unless requested.
+- Start subagents unless necessary.
+- Re-run the same analysis unless the underlying files changed.
+
+## Power BI and MCP Rules
+
+For Power BI, Fabric, Semantic Model, PBIP, TMDL and Report work:
+
+Never load an entire model when a specific object is requested.
+
+Prefer:
+
+- Individual table analysis
+- Individual measure analysis
+- Individual visual analysis
+- Individual page analysis
+
+However, full-semantic-model inspection is permitted when:
+
+- Performing a review
+- Performing governance validation
+- Performing performance assessment
+- Performing report certification
+
+No approval is required for read-only inspection.
+
+Approval is required only when modifications are requested.
+
+## Power BI Reviewer
+
+When reviewing Power BI projects prioritise:
+
+1. Broken measures
+2. Broken relationships
+3. Invalid model design
+4. Performance issues
+5. Accessibility issues
+6. Naming standard compliance
+7. Display folder compliance
+8. Theme compliance
+9. Native visual compliance
+10. Security and RLS review
+
+Categorise findings as:
+
+### Critical
+
+Issues that may cause incorrect data, broken visuals, security concerns, or report failure.
+
+### Recommended
+
+Issues that may affect maintainability, performance, usability, governance, or supportability.
+
+### Informational
+
+Observations and suggestions that do not require action.
+
+Provide concise actionable findings.
+
+## Activity Logging
+
+Maintain an activity log only for state-changing actions.
+
+Log when:
+
+- A file is created
+- A file is modified
+- A file is deleted
+- A semantic model is modified
+- A PBIP project is modified
+- A report definition is modified
+- A deployment occurs
+- A publish occurs
+- A Fabric item is created, updated, or deleted
+
+Do not log:
+
+- File reads
+- Metadata inspection
+- Report reviews
+- Semantic model reviews
+- DAX analysis
+- PBIP inspection
+- Read-only MCP operations
+- Repository searches
+- Documentation lookups
+- Schema exploration
+- Review findings
+
+If no changes were made, no log entry is required.
+
+The activity log is append-only.
+
+Never log:
+
+- Credentials
+- Tokens
+- Secrets
+- Connection strings
+- Sensitive values
+
+## Activity Log Entry Format
+
+### [YYYY-MM-DD HH:mm:ss local time]
+
+#### Change
+
+Short description of what changed.
+
+#### Files
+
+List modified files.
+
+#### Reason
+
+Brief explanation.
+
+#### Result
+
+Outcome of the change.
+
+## User-Facing Summary
+
+Provide execution summaries only when:
+
+- Files were modified
+- Models were modified
+- Reports were modified
+- Deployments occurred
+
+For read-only reviews and inspections:
+
+Return findings only.
+
+Do not generate execution summaries.
+
+Do not provide token estimates unless explicitly requested.
+
+## Approval Rules
+
+Ask for confirmation before:
+
+- Deploying changes
+- Publishing changes
+- Bulk file modifications
+- Repository-wide modifications
+- Destructive changes
+- Deleting files
+- Large-scale refactoring
+
+No confirmation required for:
+
+- Reading files
+- Reviewing reports
+- Reviewing PBIP projects
+- Reviewing semantic models
+- Reviewing DAX
+- Read-only MCP operations
+- Metadata inspection
+- Governance assessments
+- Performance reviews
+
+## General Working Rules
+
+- Focus on the user's requested task.
+- Prefer the smallest sufficient operation.
+- Avoid unnecessary exploration.
+- Avoid duplicate work.
+- Explain potentially expensive changes before making them.
+- If scope is ambiguous, choose the safest low-cost interpretation.
+- If a task can be completed without MCP, do not use MCP.
+- If a task can be completed with one MCP call, do not use several.
+- If a tool returns excessive information, use narrower follow-up queries.
