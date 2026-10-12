@@ -58,6 +58,7 @@ Fabric REST APIs: https://learn.microsoft.com/en-us/rest/api/fabric/articles/
 - Use Medallion architecture: Bronze (raw) → Silver (cleaned) → Gold (aggregated)
 - Lakehouse for data engineering, Warehouse for SQL analytics
 - Delta Lake format for all Lakehouse tables
+- Use `skills/project-osmos/SKILL.md` when a local agent should carry a complex Lakehouse, OneLake, notebook, or Spark outcome end to end. In Copilot for Microsoft Fabric, it returns the current availability guidance instead of calling Project Osmos.
 - Use `skills/spark-cli/SKILL.md` for notebook authoring and runs, Livy analysis, Spark diagnostics, and the full Materialized Lake View lifecycle.
 
 ### Development
@@ -68,6 +69,7 @@ Fabric REST APIs: https://learn.microsoft.com/en-us/rest/api/fabric/articles/
 - Power Query M for Dataflows Gen2 transformations (see the `dataflows-cli` skill)
 - Eventstream for real-time event ingestion (graph-based topology with sources, operators, destinations); use `skills/eventstream-cli/SKILL.md` and select its authoring or consumption mode by intent
 - Activator for Reflex alerts, notifications, and automated actions over Fabric events and data, including Power BI-backed metrics
+- Synapse Dedicated SQL Pool-to-Warehouse migrations use `skills/synapse-migration/SKILL.md`: run source Dedicated Pool SQL with `sqlcmd` and target Fabric Warehouse SQL with the Fabric SQL Endpoint MCP `execute_query` tool. Use `sqldw-cli` for standalone Warehouse work outside that migration.
 - DAX for Semantic Model measures
 - Semantic model development (see `semantic-model-authoring`)
 - Power BI report planning skill: `skills/powerbi-report-planning/SKILL.md` — requirements, page plan, approval gate
@@ -96,6 +98,7 @@ Fabric REST APIs: https://learn.microsoft.com/en-us/rest/api/fabric/articles/
 
 ### Cost Estimation & Migration Planning
 - E2E skill: `skills/e2e-fabric-cost-estimation/SKILL.md` — estimate Fabric capacity costs, SKU sizing, billing strategy, workload CU equivalence mapping
+- Synapse migration skill: `skills/synapse-migration/SKILL.md` — migrate Synapse Spark, Lake Database/HMS, Dedicated SQL Pool schema and procedures, and explicitly approved dependent procedure callers to Fabric
 
 ### Power BI / FabricIQ
 - Consumption skill: `skills/fabriciq/SKILL.md` — raw DAX queries against semantic models via MCP ExecuteQuery tool
