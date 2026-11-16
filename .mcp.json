@@ -34,6 +34,22 @@
         "--readwrite",
         "--skip-confirmation"
       ]
+    },
+    	"powerbi-authoring-local": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@microsoft/powerbi-modeling-mcp@latest",
+				"--start"				
+			]
+		},
+    
+     "powerbi-servers": {
+        "powerbi-remote": {
+            "type": "http",
+            "url": "https://api.fabric.microsoft.com/v1/mcp/powerbi"
+        }
     }
   }
 }
