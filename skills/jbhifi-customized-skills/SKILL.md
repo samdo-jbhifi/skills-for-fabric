@@ -1,6 +1,6 @@
 ---
 name: jbhifi-customized-skills
-description: "Router for reviewing a Power BI report built from a JBHIFI Group reporting template. Load this whenever asked to review, audit, or check the standard of a JBHIFI-based report or semantic model, then load the matching per-template doc it points to."
+description: "Router for reviewing a Power BI report built from a JBHIFI Group reporting template, and for recording a reusable context summary of any report analysed through MCP modelling. Load this whenever asked to review, audit, or check the standard of a JBHIFI-based report or semantic model, then load the matching per-template doc it points to. Also load it when starting MCP analysis of a report that has no saved summary in docs/report-context/, or when asked to record context for a report."
 ---
 
 > **CRITICAL NOTE — templates can be wrong.** The per-template docs below document what each
@@ -82,11 +82,21 @@ semantic-model-only review, rather than implying the visuals themselves were che
 | `GRP Reporting Template` | [grp-reporting-template-review-skill.md](./grp-reporting-template-review-skill.md) |
 | `TGG PBI Style Template` (or any report federating measures via `EXTERNALMEASURE`/DirectQuery to a shared AS dataset) | [tgg-reporting-template-review-skill.md](./tgg-reporting-template-review-skill.md) |
 | Something else / unsure which template it descends from | See below, then write a new sibling doc |
+| Any report being analysed via MCP that has no saved summary (not a review) | [report-context-capture.md](./report-context-capture.md) |
 
 > The `.pbip` file this row refers to may still literally be named `GRP Supply Chain Reporting
 > Template` on disk — this table's left column is descriptive, not a literal filename match.
 > Don't route by comparing an exact name string; use the table-presence check below, which is
 > reliable regardless of what the file is actually called.
+
+## Report context summaries (any report, any template)
+
+Separately from reviewing, whenever you analyse a report through `powerbi-modeling-stdio` MCP,
+follow [report-context-capture.md](./report-context-capture.md): check `docs/report-context/` for
+an existing summary first and reuse it, and after the first analysis of an unseen report offer to
+save a concise summary there. The file is written only after the user confirms, and the creation
+is logged in `docs/claude-activity-log.md`. This applies to every report, including ones that
+match none of the templates below.
 
 ## Ask first — don't guess lineage if you can just ask
 

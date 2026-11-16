@@ -285,3 +285,123 @@ Log future significant actions going forward, per-entry, as they occur.
 
 ### Notes
 Backfilled entries are grouped by task/milestone rather than by individual tool call, given the volume of calls across this session — this keeps the log readable while still capturing every significant action category the rules require (MCP calls, file changes, model changes). Exact historical timestamps are approximated to the known session date; this is noted at the top of the file rather than presented as precise.
+
+
+### [2026-11-11 11:05:00]
+
+#### Change
+
+Created two measures in the open `JB NZ Services Insights` model (`Metrics` table) via MCP: `Attach GP Base` (01. Base Metrics) and `GP` (01. TY Metrics, currency format). Not yet saved to disk.
+
+#### Files
+
+- None directly (live Desktop session for `JBNZ service\JB NZ Services Insights.pbip`; saved only when the user presses Ctrl+S).
+
+#### Reason
+
+User requested a GP metric: attach total excl GST minus attach cost.
+
+#### Result
+
+Both measures created, state Ready. Earlier create attempts were declined because the MCP server had started without `--skip-confirmation`; a server restart fixed it.
+
+
+### [2026-11-11 11:15:00]
+
+#### Change
+
+Created three measures in the open `JB NZ Services Insights` model (`Metrics` table) via MCP: `Attach Sales Amount Exc Gst Base` (01. Base Metrics), `Attach Sales Amount Exc Gst` (01. TY Metrics) and `% GP` (01. TY Metrics, `0.0%` format). Not yet saved to disk.
+
+#### Files
+
+- None directly (live Desktop session for `JBNZ service\JB NZ Services Insights.pbip`; saved only when the user presses Ctrl+S).
+
+#### Reason
+
+User requested % GP = GP / sales. Denominator is GST-exclusive attach sales (user-confirmed) so it is like-for-like with GP.
+
+#### Result
+
+All three measures created, state Ready.
+
+
+### [2026-11-11 11:25:00]
+
+#### Change
+
+Correction to the 11:15 entry. `% GP` was first created with a SemanticError (it referenced `[GP]`, which had since been renamed `Attach GP` in Desktop). I deleted that broken `% GP` and recreated it as `DIVIDE([Attach GP], [Attach Sales Amount Exc Gst])` (01. TY Metrics, `0.0%` format). The 11:15 entry's claim that all three measures were created in state Ready was inaccurate at the time it was written.
+
+#### Files
+
+- None directly (live Desktop session; saved only when the user presses Ctrl+S).
+
+#### Reason
+
+Fix a broken measure I had created.
+
+#### Result
+
+`% GP` now state Ready. `Attach Sales Amount Exc Gst Base` and `Attach Sales Amount Exc Gst` were unaffected.
+
+
+### [2026-11-11 12:00:00]
+
+#### Change
+
+Updated the user-defined function `OppsXFilter` in the open `JB NZ Services Insights` model via MCP (`function_operations Update`, lineage tag unchanged). When `SELECTEDVALUE('Service Type'[Service Name]) = "Installation"` it now uses the normal `Service`-level relationship (`CALCULATE(thisMeasure)`); all other services keep the previous `USERELATIONSHIP` on `Service Type` with `CROSSFILTER` NONE on `Service`.
+
+#### Files
+
+- None directly (live Desktop session for `JBNZ service\JB NZ Services Insights.pbip`; saved only when the user presses Ctrl+S).
+
+#### Reason
+
+Opp Sales Units/Amount for Installation sub-services (Visual, Computers & Comms, Others) each showed the whole Installation total because all three share the `Service Type` value "Installation".
+
+#### Result
+
+Function state Ready. Verified on live measures: Visual 44,573 units, Computers & Comms 178,090, Others blank; Installation total 222,663 unchanged; overall Opp Sales Units total 1,972,054 unchanged; other services unchanged. Also affects Opp Sales Amount (shared function).
+
+### [2026-11-12 14:03:13]
+
+#### Change
+Live model (JB NZ Services Insights, Desktop session, not yet saved): KPIs M query extended with replacements installation->Installation and OEM->Internet Security; new calculated column Service Type[Attach Group] (Service for M365 and Internet Security, else Service Name); KPIs relationship repointed from Service Type[Service Name] to Service Type[Attach Group] (delete+recreate, many-to-many, both directions); measures KPI Mid and KPI High recreated over VALUES('Service Type'[Attach Group]). KPIs partition and Service Type table refreshed (KPIs full refresh returned only the 4 original services - dataflow entity not yet serving the new rows).
+
+#### Files
+None on disk yet (changes live in the open Desktop model until saved). Report visual 4d31d0ff600b0c36c12c not yet changed.
+
+#### Reason
+Show M365 and Internet Security as separate rows in the Attach KPIs table (Services Leaderboard).
+
+#### Result
+Model objects Ready. Installation/M365 KPIs matched in the pre-refresh test; Internet Security had no target (OEM not renamed at that point). After the full refresh the KPIs table holds 8 rows / 4 services, so new targets must be re-pulled once the dataflow serves them. KPI High lineageTag was recreated with a typo (ef9f5cf2 instead of ef9f5cb9) - to be corrected.
+
+### [2026-11-12 14:22:11]
+
+#### Change
+Reapplied all model changes to the new JB NZ Services Insights instance (live Desktop session, not yet saved): OppsXFilter updated (Installation Opp metrics split by Service); measures Attach GP Base, Attach GP, Attach Sales Amount Exc Gst Base, Attach Sales Amount Exc Gst, Attach GP %; KPIs M query extended (installation->Installation, OEM->Internet Security, keeping the new file's own dataflow source IDs); Service Type[Attach Group] calculated column; KPIs relationship repointed to Attach Group (delete+recreate); KPI Mid and KPI High recreated over Attach Group with original lineage tags.
+
+#### Files
+None on disk yet (live model only). Report visual (Attach KPIs table, Services Leaderboard) not yet changed - new PBIP path needed.
+
+#### Reason
+Previous PBIP files were corrupted and deleted by the user; the changes had to be redone on the new file. Supersedes the earlier entries for the deleted file.
+
+#### Result
+All objects Ready. Verified by DAX: KPI targets per Attach Group (Telco 30/38.3, Installation 9/22, M365 4/6.6, Internet Security 6.99/13.7, etc.); Installation Opp Units Visual 44,570 and Computers & Comms 177,998. Earlier note about the KPI refresh returning 4 services is explained: the old file pointed at a different dataflow than the new file.
+
+### [2026-11-16 11:57:55]
+
+#### Change
+Added a report-context capture procedure to the jbhifi-customized-skills skill, plus a seed example summary.
+
+#### Files
+- skills/jbhifi-customized-skills/report-context-capture.md (created)
+- skills/jbhifi-customized-skills/SKILL.md (modified: description, new "Report context summaries" section, new row in the routing table)
+- docs/report-context/jb-nz-services-insights.md (created, seed example)
+
+#### Reason
+User asked for a function to record summary context for any new report analysed through MCP modelling. Decisions: summaries live in docs/report-context/, offered after first analysis and saved only on user confirmation, concise (about one page).
+
+#### Result
+Files written. Not committed. The seed summary mixes facts verified on 2026-11-12 with items marked unverified.
