@@ -26,8 +26,9 @@ Seed example for `skills/jbhifi-customized-skills/report-context-capture.md`.
   `Sales Person`, `Service Type`, `KPIs`, `Sale Type` (Written / Delivered).
 - `Metrics`: measure-only table (56 measures before our changes).
 - Field parameters: `Store (FP)`, `Product (FP)`, `Time Period (FP)`.
-- `Service Type` columns: Service Name, Service, Service Type, Sort Order, plus calculated
-  `Attach Group` (added 2026-11-12).
+- `Service Type` columns: Service Name, Service, Service Type, Sort Order. (A calculated
+  `Attach Group` column was added 2026-11-12 and removed 2026-11-16, because Service Name now
+  has M365 and Internet Security as separate values.)
 
 ## Relationships (non-obvious only; verified by relationship list)
 - `Services Sales[Unique Reference]` <-> `Primary Sales[Unique Reference]`: many-to-many, both
@@ -37,8 +38,8 @@ Seed example for `skills/jbhifi-customized-skills/report-context-capture.md`.
 - `Services Sales[Service]` -> `Service Type[Service]`: active, single direction.
 - `Services Sales[Service Type]` <-> `Service Type[Service Type]`: inactive many-to-many, activated
   by `OppsXFilter` through `USERELATIONSHIP`.
-- `KPIs[Attach Services Name]` <-> `Service Type[Attach Group]`: many-to-many, both directions
-  (was `Service Name` until 2026-11-12).
+- `KPIs[Attach Services Name]` <-> `Service Type[Service Name]`: many-to-many, both directions
+  (verified 2026-11-16; briefly pointed at `Attach Group`, now removed).
 - Written vs Delivered store and date keys exist as inactive relationships.
 
 ## Measure architecture (verified)
@@ -58,17 +59,20 @@ Seed example for `skills/jbhifi-customized-skills/report-context-capture.md`.
 ## Business rules
 - Service Name -> Service: Telco {IFO, Plan Only, Sidekick}; Apple Care {Apple Care};
   Extra Care {EC Repair, EC Replace}; JB Extras {JB Extras};
-  M365 and Internet Security {M365, Internet Security}; Installation {Computers & Comms, Visual,
-  Others}.
-- Attach KPI targets (Mid / High) exist per `Attach Group` in `KPIs`; the source keys were
-  renamed in the model query (for example OEM is Internet Security).
-- Opportunity counts are identical for M365 and Internet Security because they share one
-  Service Type (verified in the model; behaviour before our changes was not confirmed).
+  Installation {Computers & Comms, Visual, Others}. As of 2026-11-16 Service Name lists M365 and
+  Internet Security as separate values (verified by DAX); the Service values under them were not
+  re-queried (unverified). Earlier they were one Service Name, "M365 and Internet Security".
+- Attach KPI targets (Mid / High) exist per Service Name in `KPIs` (7 services, verified
+  2026-11-16); source keys are renamed in the KPIs model query (for example OEM is Internet
+  Security, installation is Installation).
+- Opportunity counts were identical for M365 and Internet Security on 2026-11-12 because they
+  share one Service Type (not re-checked since the Service Name change).
 
 ## Known data quirks
 - Computers & Comms rows had no attach units or amount in the earlier model copy (verified
   there; not re-checked in the current one).
-- ~510 attach units sit under a blank `Attach Group` (rows with no matching Service Type).
+- ~510 attach units sat under a blank Service Name group on 2026-11-12 (rows with no matching
+  Service Type); not re-checked.
 - Extra Care GP % showed 100% (cost blank?); Telco and JB Extras GP / GP % blank. Causes not
   investigated (unverified).
 
@@ -80,12 +84,14 @@ Seed example for `skills/jbhifi-customized-skills/report-context-capture.md`.
   make `Primary Sales[Unique Reference]` the "one" side, keep bidirectional.
 
 ## Open issues
-- Attach KPIs table visual still uses `Service Name` rows; swap to `Attach Group` pending.
+- Attach KPIs table: whether it now shows M365 and Internet Security as separate rows has not
+  been checked in the report (visuals aren't readable from a PBIX through MCP).
 - Relationship change above awaiting approval and testing.
 
 ## Changes made
 - 2026-11-10 to 2026-11-12: see `docs/claude-activity-log.md` entries for GP measures,
-  OppsXFilter, KPI Attach Group changes and the reapply on the new file.
+  OppsXFilter, KPI Attach Group changes and the reapply on the new file; 2026-11-16 entry for
+  removing `Attach Group` and returning the KPI relationship and measures to Service Name.
 
 ## Last verified
 - 2026-11-12, via the live model through MCP (relationship list, DAX queries) and PBIR page files.

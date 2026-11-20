@@ -405,3 +405,64 @@ User asked for a function to record summary context for any new report analysed 
 
 #### Result
 Files written. Not committed. The seed summary mixes facts verified on 2026-11-12 with items marked unverified.
+
+### [2026-11-16 17:09:07]
+
+#### Change
+Removed calculated column Service Type[Attach Group] and returned its dependencies to Service Type[Service Name] (live model, then saved by the user into the PBIX per Desktop session): relationship KPIs[Attach Services Name] <-> Service Type[Service Name] recreated (many-to-many, both directions, original name); measures KPI Mid and KPI High recreated over VALUES('Service Type'[Service Name]) with original lineage tags. Dependencies found with INFO.CALCDEPENDENCY before and after (none remained). Column then deleted.
+
+#### Files
+- docs/report-context/jb-nz-services-insights.md (modified to match)
+
+#### Reason
+User asked to replace Attach Group with Service Name. Service Name now has M365 and Internet Security as separate values, so the grouping column is redundant.
+
+#### Result
+Verified by DAX: all 7 services return Mid/High targets by Service Name (including M365 4/6.6 and Internet Security 6.99/13.7). Report visuals not checked (PBIX). Model changes are live in Desktop until Ctrl+S.
+
+### [2026-11-16 17:09:14]
+
+#### Change
+Correction to the previous entry: the Attach Group removal has NOT been saved to the PBIX. It exists only in the live Desktop session until the user presses Ctrl+S.
+
+#### Files
+None.
+
+#### Reason
+The previous entry's Change text wrongly said the user had saved it.
+
+#### Result
+Log corrected.
+
+### [2026-11-17 10:53:06]
+
+#### Change
+Live model (JB NZ Services Insights PBIP, Desktop session, not yet saved): created display folder "ADU KPIs" in Metrics with measures ADU Mid, ADU High (average of ADU[ADU Target] by Range per Service Name, format \$#,0.00) and ADU CF (green/yellow/red hex colours matching KPI CF; returns blank when the service has no ADU target). Column ADU[ADU Target] had already been renamed by the user.
+
+#### Files
+None on disk yet (live model only; Desktop save needed).
+
+#### Reason
+User asked for an ADU measure folder similar to the KPIs folder, for the new ADU KPIs table. Tooltip, % and label measures from the KPIs folder were deliberately not mirrored (unused until requested).
+
+#### Result
+Verified by DAX per Service Name: Apple Care ADU 176.72 vs Mid 150 / High 190 (yellow), Extra Care 49.97 vs 40 / 46 (green); other services have no target (blank). Report visual (Attach ADU) not yet edited.
+
+### [2026-11-20 15:31:53]
+
+#### Change
+
+Added report page "Product Group Opportunities" (after Services by Day): header, slicers and footer cloned from Services Leaderboard; new matrix (Product Group Desc rows, Opp Sales Units values, sorted descending). Date Groups slicer set to Current Week (9/11/2026 - 15/11/2026) and Calendar slicer start set to 9/11/2026. Also installed the two Power BI report CLIs globally with npm and added the npm global folder to the user PATH.
+
+#### Files
+
+- samples/JBNZ service/JB NZ Services Insights.Report/definition/pages/pages.json
+- samples/JBNZ service/JB NZ Services Insights.Report/definition/pages/<new page folder>/ (page.json, 21 cloned visuals, 1 new matrix)
+
+#### Reason
+
+User request: matrix of total opportunity units per product group for a period, in the JB Hi-Fi template style, with page filters.
+
+#### Result
+
+Validated (no diagnostics on the new page; 5 existing errors in theme file name and bookmark files unchanged), reloaded in Desktop and screenshotted. Matrix values match DAX for the same period.
